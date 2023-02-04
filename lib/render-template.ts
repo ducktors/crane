@@ -8,7 +8,7 @@ import {
   writeFileSync,
   copyFileSync,
 } from 'node:fs'
-import * as path from 'node:path'
+import { basename, resolve, dirname } from 'node:path'
 
 import { deepMerge } from './deep-merge'
 import { sortDependencies } from './sort-dependencies'
@@ -18,19 +18,19 @@ function renderTemplate(src: string, dest: string) {
 
   if (stats.isDirectory()) {
     // skip node_module
-    if (path.basename(src) === 'node_modules') {
+    if (basename(src) === 'node_modules') {
       return
     }
 
     // if it's a directory, render its subdirectories and files recursively
     mkdirSync(dest, { recursive: true })
     for (const file of readdirSync(src)) {
-      renderTemplate(path.resolve(src, file), path.resolve(dest, file))
+      renderTemplate(resolve(src, file), resolve(dest, file))
     }
     return
   }
 
-  const filename = path.basename(src)
+  const filename = basename(src)
 
   if (filename === 'package.json' && existsSync(dest)) {
     // merge instead of overwriting
@@ -43,7 +43,7 @@ function renderTemplate(src: string, dest: string) {
 
   if (filename.startsWith('_')) {
     // rename `_file` to `.file`
-    dest = path.resolve(path.dirname(dest), filename.replace(/^_/, '.'))
+    dest = resolve(dirname(dest), filename.replace(/^_/, '.'))
   }
 
   if (filename === '_gitignore' && existsSync(dest)) {

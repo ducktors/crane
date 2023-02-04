@@ -17,11 +17,11 @@
     "test:ci": "vitest run --coverage --silent"
   },
   "dependencies": {
-    "tslib": "^2.4.1"
+    "tslib": "^2.5.0"
   },
   "devDependencies": {
-    "@types/node": "^16.18.3",
-    "@vitest/coverage-istanbul": "^0.27.3",
+    "@types/node": "^16.18.11",
+    "@vitest/coverage-istanbul": "^0.28.4",
     "coveralls": "^3.1.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.0",

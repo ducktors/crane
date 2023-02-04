@@ -1,3 +1,4 @@
+#!/bin/env node
 import {
   existsSync,
   readdirSync,
@@ -64,6 +65,21 @@ function emptyDir(dir: string) {
   )
 }
 
+function isValidPackageName(projectName: string) {
+  return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(
+    projectName,
+  )
+}
+
+function toValidPackageName(projectName: string) {
+  return projectName
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/^[._]/, '')
+    .replace(/[^a-z0-9-~]+/g, '-')
+}
+
 // possible options:
 // --lib
 // --app
@@ -114,6 +130,14 @@ async function cli() {
 
             return `${dirForPrompt} is not empty. Remove existing files and continue?`
           },
+        },
+        {
+          name: 'packageName',
+          type: () => (isValidPackageName(projectDir) ? null : 'text'),
+          message: 'Package name:',
+          initial: () => toValidPackageName(projectDir),
+          validate: (dir) =>
+            isValidPackageName(dir) || 'Invalid package.json name',
         },
         {
           name: 'type',
@@ -184,15 +208,7 @@ async function cli() {
     renderTemplate(templateDir, fullProjectDir)
   }
   render('base')
-  // Instructions:
-  // Supported package managers: pnpm > yarn > npm
-  const userAgent = process.env.npm_config_user_agent ?? ''
-  const packageManager = /pnpm/.test(userAgent)
-    ? 'pnpm'
-    : /yarn/.test(userAgent)
-    ? 'yarn'
-    : 'npm'
-
+  const packageManager = 'pnpm'
   // README generation
   writeFileSync(
     resolve(fullProjectDir, 'README.md'),
@@ -213,11 +229,11 @@ async function cli() {
   console.log(`  ${bold(green(getCommand(packageManager, 'dev')))}`)
   console.log()
 }
+// common deps: @types/node, typescript, vitest, @vitest/coverage-istanbul, rome, coveralls, lint-staged, husky
+// libs dev deps: common deps, tsup
+// apps dev deps: common deps, tsx
+// monorepo dev deps: turbo, @changesets/cli, @changesets/changelog-github
 
 cli().catch((e) => {
   console.error(e)
 })
-// common deps: typescript, vitest, @vitest/coverage-istanbul, rome, coveralls, lint-staged, husky
-// libs dev deps: common deps
-// apps dev deps: common deps, tsx
-// monorepo dev deps: turbo, @changesets/cli, @changesets/changelog-github
