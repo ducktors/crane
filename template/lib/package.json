@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup-node",
+    "lint": "tsc --noEmit && rome check ."
+  },
+  "devDependencies": {
+    "tsup": "^6.5.0"
+  }
+}

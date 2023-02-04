@@ -15,4 +15,5 @@
 </p>
 
 
-Opinionated Ducktors' Project Starter Generator
+Opinionated Ducktors' Project Generator
+
