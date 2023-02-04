@@ -16,6 +16,7 @@
   "author": "Ducktors <your@ducktors.dev> (https://ducktors.dev)",
   "license": "MIT",
   "dependencies": {
+    "execa": "^6.1.0",
     "kolorist": "^1.7.0",
     "minimist": "^1.2.7",
     "prompts": "^2.4.2",

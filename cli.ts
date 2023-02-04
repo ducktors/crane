@@ -12,7 +12,7 @@ import { join, relative, resolve } from 'node:path'
 
 import prompts from 'prompts'
 import minimist from 'minimist'
-import { red, yellow, bold, green } from 'kolorist'
+import { red, yellow, bold, green, cyan } from 'kolorist'
 
 import renderTemplate from './lib/render-template'
 import generateReadme from './lib/generate-readme'
@@ -184,14 +184,32 @@ async function cli() {
       `\n${yellow('Crane')} is deleting the content of ${fullProjectDir}`,
     )
     emptyDir(fullProjectDir)
-    console.log(`\n${yellow('Crane')} content deleted.`)
+    console.log(`\n${green('✔')} ${yellow('Crane')} content deleted.`)
   } else if (!existsSync(fullProjectDir)) {
     mkdirSync(fullProjectDir)
-    console.log(`\nProject folder ${fullProjectDir} created.`)
+    console.log(
+      `\n${green('✔')} ${yellow(
+        'Crane',
+      )} Project folder ${fullProjectDir} created.`,
+    )
+  } else {
+    console.log(
+      `\n${yellow('⚠')} ${yellow(
+        'Crane',
+      )} Project folder ${fullProjectDir} already exists.`,
+    )
+    console.log(
+      `\n${red('✖')} ${yellow(
+        'Crane',
+      )} If you want to overwrite the content of the folder, please run the command with the --force option.`,
+    )
+    process.exit(1)
   }
 
   console.log(
-    `\n${yellow('Crane')} is scaffolding the project in ${fullProjectDir}...`,
+    `\n${cyan('/')} ${yellow(
+      'Crane',
+    )} is scaffolding the project in ${fullProjectDir}`,
   )
 
   const pkg = { name: packageName, version: '0.0.0' }
@@ -220,7 +238,26 @@ async function cli() {
     }),
   )
 
-  console.log(`\n${yellow('Crane')} scaffolding complete. Now run:\n`)
+  try {
+    const { execa } = await import('execa')
+    const out = await execa('git', ['init'], { cwd: fullProjectDir })
+    console.log(`\n${green('✔')} ${yellow('Crane')} ${out.stdout}`)
+  } catch (err: any) {
+    console.log(
+      `\n${red('✖')} ${yellow('Crane')} ${`${bold('git init failed')} with "${
+        err.message.split('\n')[0]
+      }"`}`,
+    )
+    rmdirSync(fullProjectDir, { recursive: true })
+    console.log(
+      `\n${green('✔')} ${yellow('Crane')} Project directory rolled back.`,
+    )
+    process.exit(1)
+  }
+
+  console.log(
+    `\n${green('✔')} ${yellow('Crane')} scaffolding complete. Now run:\n`,
+  )
   if (fullProjectDir !== cwd) {
     console.log(`  ${bold(green(`cd ${relative(cwd, fullProjectDir)}`))}`)
   }
