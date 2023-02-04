@@ -10,7 +10,9 @@
     "cli.js"
   ],
   "scripts": {
-    "build": "tsup-node"
+    "build": "tsup-node",
+    "lint": "tsc --noemit && rome check .",
+    "format": "rome format --write ."
   },
   "keywords": [],
   "author": "Ducktors <your@ducktors.dev> (https://ducktors.dev)",

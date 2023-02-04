@@ -11,7 +11,7 @@ import {
 import { basename, resolve, dirname } from 'node:path'
 
 import { deepMerge } from './deep-merge'
-import { sortDependencies } from './sort-dependencies'
+import { sortProperties } from './sort-properties'
 
 function renderTemplate(src: string, dest: string) {
   const stats = statSync(src)
@@ -36,7 +36,7 @@ function renderTemplate(src: string, dest: string) {
     // merge instead of overwriting
     const existing = JSON.parse(readFileSync(dest, 'utf8'))
     const newPackage = JSON.parse(readFileSync(src, 'utf8'))
-    const pkg = sortDependencies(deepMerge(existing, newPackage))
+    const pkg = sortProperties(deepMerge(existing, newPackage))
     writeFileSync(dest, JSON.stringify(pkg, null, 2) + '\n')
     return
   }

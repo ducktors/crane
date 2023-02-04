@@ -1,23 +1,24 @@
 // taken from https://github.com/vuejs/create-vue/blob/main/utils/sortDependencies.ts
 
-export function sortDependencies(packageJson: any) {
+export function sortProperties(packageJson: any) {
   const sorted: any = {}
 
-  const depTypes = [
+  const propertiesTypes = [
     'dependencies',
     'devDependencies',
     'peerDependencies',
     'optionalDependencies',
+    'scripts',
   ]
 
-  for (const depType of depTypes) {
-    if (packageJson[depType]) {
-      sorted[depType] = {}
+  for (const prop of propertiesTypes) {
+    if (packageJson[prop]) {
+      sorted[prop] = {}
 
-      Object.keys(packageJson[depType])
+      Object.keys(packageJson[prop])
         .sort()
         .forEach((name) => {
-          sorted[depType][name] = packageJson[depType][name]
+          sorted[prop][name] = packageJson[prop][name]
         })
     }
   }

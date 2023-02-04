@@ -108,6 +108,10 @@ async function cli() {
     projectType?: 'app' | 'lib'
   } = {}
   try {
+    console.log()
+    console.log('🏗️')
+    console.log()
+
     result = await prompts(
       [
         {
@@ -140,7 +144,7 @@ async function cli() {
             isValidPackageName(dir) || 'Invalid package.json name',
         },
         {
-          name: 'type',
+          name: 'projectType',
           type: () => (argv.app || argv.lib ? null : 'select'),
           message: 'Select project type:',
           choices: [
@@ -181,10 +185,12 @@ async function cli() {
 
   if (existsSync(fullProjectDir) && force) {
     console.log(
-      `\n${yellow('Crane')} is deleting the content of ${fullProjectDir}`,
+      `\n${cyan('/')} ${yellow(
+        'Crane',
+      )} Deleting the content of ${fullProjectDir}`,
     )
     emptyDir(fullProjectDir)
-    console.log(`\n${green('✔')} ${yellow('Crane')} content deleted.`)
+    console.log(`\n${green('✔')} ${yellow('Crane')} Content deleted.`)
   } else if (!existsSync(fullProjectDir)) {
     mkdirSync(fullProjectDir)
     console.log(
@@ -209,7 +215,7 @@ async function cli() {
   console.log(
     `\n${cyan('/')} ${yellow(
       'Crane',
-    )} is scaffolding the project in ${fullProjectDir}`,
+    )} Scaffolding the project in ${fullProjectDir}`,
   )
 
   const pkg = { name: packageName, version: '0.0.0' }
@@ -225,7 +231,15 @@ async function cli() {
     const templateDir = resolve(templateRoot, templateName)
     renderTemplate(templateDir, fullProjectDir)
   }
+
   render('base')
+
+  if (projectType === 'app') {
+    render('app')
+  } else if (projectType === 'lib') {
+    render('lib')
+  }
+
   const packageManager = 'pnpm'
   // README generation
   writeFileSync(
@@ -256,7 +270,7 @@ async function cli() {
   }
 
   console.log(
-    `\n${green('✔')} ${yellow('Crane')} scaffolding complete. Now run:\n`,
+    `\n${green('✔')} ${yellow('Crane')} Scaffolding complete. Now run:\n`,
   )
   if (fullProjectDir !== cwd) {
     console.log(`  ${bold(green(`cd ${relative(cwd, fullProjectDir)}`))}`)
