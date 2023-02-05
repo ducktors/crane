@@ -5,8 +5,5 @@
   ],
   "scripts": {
     "build": "tsc --noEmit && tsup-node"
-  },
-  "devDependencies": {
-    "tsup": "^6.5.0"
   }
 }
