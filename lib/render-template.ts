@@ -8,10 +8,12 @@ import {
   writeFileSync,
   copyFileSync,
 } from 'node:fs'
-import { basename, resolve, dirname } from 'node:path'
+import { basename, resolve, dirname, sep } from 'node:path'
 
 import { deepMerge } from './deep-merge'
 import { sortProperties } from './sort-properties'
+import { generateDependencies } from './generate-dependencies'
+import { dependenciesByTemplate } from './template-dependencies'
 
 function renderTemplate(src: string, dest: string) {
   const stats = statSync(src)
@@ -37,6 +39,12 @@ function renderTemplate(src: string, dest: string) {
     const existing = JSON.parse(readFileSync(dest, 'utf8'))
     const newPackage = JSON.parse(readFileSync(src, 'utf8'))
     const pkg = sortProperties(deepMerge(existing, newPackage))
+    const cliPackage = JSON.parse(readFileSync('package.json', 'utf8'))
+    const templateName = dirname(src).split(sep).at(-1)
+    if (!['base', 'with-husky'].includes(templateName!)) {
+      pkg.dependencies = generateDependencies(cliPackage, dependenciesByTemplate.get(templateName!)!.dependencies)
+      pkg.devDependencies = generateDependencies(cliPackage, dependenciesByTemplate.get(templateName!)!.devDependencies)
+    }
     writeFileSync(dest, JSON.stringify(pkg, null, 2) + '\n')
     return
   }
