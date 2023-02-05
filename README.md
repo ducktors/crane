@@ -15,5 +15,12 @@
 </p>
 
 
-Opinionated Ducktors' Project Generator
+## Opinionated Ducktors' Project Generator
 
+__WIP__
+- [ ] GitHub workflows
+- [ ] lint-staged
+- [ ] conventional commits
+- [ ] commitlint
+- [ ] semantic release for non-monorepo
+- [ ] changesets for monorepo

@@ -1,69 +1,21 @@
 #!/bin/env node
-import {
-  existsSync,
-  readdirSync,
-  mkdirSync,
-  lstatSync,
-  rmdirSync,
-  unlinkSync,
-  writeFileSync,
-} from 'node:fs'
+import { existsSync, mkdirSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
 import prompts from 'prompts'
 import minimist from 'minimist'
 import { red, yellow, bold, green, cyan } from 'kolorist'
 
-import renderTemplate from './lib/render-template'
-import generateReadme from './lib/generate-readme'
 import { getCommand } from './lib/get-command'
-
-function canSkipEmptying(dir: string) {
-  if (!existsSync(dir)) {
-    return true
-  }
-
-  const files = readdirSync(dir)
-  if (files.length === 0) {
-    return true
-  }
-  if (files.length === 1 && files[0] === '.git') {
-    return true
-  }
-
-  return false
-}
-
-function postOrderDirectoryTraverse(
-  dir: string,
-  dirCallback: (dir: string) => void,
-  fileCallback: (file: string) => void,
-) {
-  for (const filename of readdirSync(dir)) {
-    if (filename === '.git') {
-      continue
-    }
-    const fullpath = resolve(dir, filename)
-    if (lstatSync(fullpath).isDirectory()) {
-      postOrderDirectoryTraverse(fullpath, dirCallback, fileCallback)
-      dirCallback(fullpath)
-      continue
-    }
-    fileCallback(fullpath)
-  }
-}
-
-function emptyDir(dir: string) {
-  if (!existsSync(dir)) {
-    return
-  }
-
-  postOrderDirectoryTraverse(
-    dir,
-    (dir) => rmdirSync(dir),
-    (file) => unlinkSync(file),
-  )
-}
+import { renderApp } from './lib/render-app'
+import { renderLib } from './lib/render-lib'
+import { renderMonorepo } from './lib/render-monorepo'
+import { renderReadme } from './lib/render-readme'
+import { gitInitRepo } from './lib/git-init-repo'
+import { getUserAgent } from './lib/get-user-agent'
+import { renderWithHusky } from './lib/render-wtih-husky'
+import { canSkipEmptying } from './lib/can-skip-emptying'
+import { emptyDir } from './lib/empty-dir'
 
 function isValidPackageName(projectName: string) {
   return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(
@@ -95,7 +47,7 @@ const cwd = process.cwd()
 let projectDir = argv._[0]
 const defaultProjectName = projectDir ?? 'my-project'
 
-if (argv.app && argv.lib) {
+if ([argv.app, argv.lib, argv.monorepo].filter(Boolean).length > 1) {
   console.log(red('✖'), 'Cannot specify both --app and --lib')
   process.exit(1)
 }
@@ -109,7 +61,7 @@ async function cli() {
   } = {}
   try {
     console.log()
-    console.log('🏗️')
+    console.log(bold(yellow('Crane CLI')))
     console.log()
 
     result = await prompts(
@@ -160,6 +112,12 @@ async function cli() {
                 'Choose this if you want to build an executable application',
               value: 'app',
             },
+            {
+              title: 'Monorepo',
+              description:
+                'Choose this if you want to build a pnpm and Turborepo monorepo.',
+              value: 'monorepo',
+            },
           ],
           initial: 0,
         },
@@ -179,7 +137,9 @@ async function cli() {
     projectName,
     packageName = projectName ?? defaultProjectName,
     force = argv.force,
-    projectType = (argv.app && 'app') || (argv.lib && 'lib'),
+    projectType = (argv.app && 'app') ||
+      (argv.lib && 'lib') ||
+      (argv.monorepo && 'monorepo'),
   } = result
   const fullProjectDir = join(cwd, projectDir)
 
@@ -218,56 +178,28 @@ async function cli() {
     )} Scaffolding the project in ${fullProjectDir}`,
   )
 
-  const pkg = { name: packageName, version: '0.0.0' }
-
-  writeFileSync(
-    resolve(fullProjectDir, 'package.json'),
-    JSON.stringify(pkg, null, 2),
-  )
-
   const templateRoot = resolve(__dirname, 'template')
 
-  function render(templateName: string) {
-    const templateDir = resolve(templateRoot, templateName)
-    renderTemplate(templateDir, fullProjectDir)
-  }
-
-  render('base')
-
   if (projectType === 'app') {
-    render('app')
+    renderApp(templateRoot, packageName, fullProjectDir)
   } else if (projectType === 'lib') {
-    render('lib')
+    renderLib(templateRoot, packageName, fullProjectDir)
+  } else if (projectType === 'monorepo') {
+    renderMonorepo(templateRoot, packageName, fullProjectDir)
   }
 
-  const packageManager = 'pnpm'
-  // README generation
-  writeFileSync(
-    resolve(fullProjectDir, 'README.md'),
-    generateReadme({
-      projectName:
-        result.projectName ?? result.packageName ?? defaultProjectName,
-      packageManager,
-      projectType,
-    }),
+  // render husky only at top root level project dir
+  renderWithHusky(templateRoot, fullProjectDir)
+
+  const packageManager = getUserAgent(projectType === 'monorepo')
+  renderReadme(
+    packageManager,
+    result.projectName ?? result.packageName ?? defaultProjectName,
+    projectType,
+    fullProjectDir,
   )
 
-  try {
-    const { execa } = await import('execa')
-    const out = await execa('git', ['init'], { cwd: fullProjectDir })
-    console.log(`\n${green('✔')} ${yellow('Crane')} ${out.stdout}`)
-  } catch (err: any) {
-    console.log(
-      `\n${red('✖')} ${yellow('Crane')} ${`${bold('git init failed')} with "${
-        err.message.split('\n')[0]
-      }"`}`,
-    )
-    rmdirSync(fullProjectDir, { recursive: true })
-    console.log(
-      `\n${green('✔')} ${yellow('Crane')} Project directory rolled back.`,
-    )
-    process.exit(1)
-  }
+  await gitInitRepo(fullProjectDir)
 
   console.log(
     `\n${green('✔')} ${yellow('Crane')} Scaffolding complete. Now run:\n`,
@@ -276,9 +208,29 @@ async function cli() {
     console.log(`  ${bold(green(`cd ${relative(cwd, fullProjectDir)}`))}`)
   }
   console.log(`  ${bold(green(getCommand(packageManager, 'install')))}`)
-  console.log(`  ${bold(green(getCommand(packageManager, 'lint')))}`)
-  console.log(`  ${bold(green(getCommand(packageManager, 'dev')))}`)
+
   console.log()
+  console.log(`\n${yellow('Crane')} Other available commands:\n`)
+  console.log()
+
+  console.log(`  ${bold(green(getCommand(packageManager, 'dev')))}`)
+  console.log(`  ${bold(green(getCommand(packageManager, 'build')))}`)
+  console.log(`  ${bold(green(getCommand(packageManager, 'test')))}`)
+  console.log(`  ${bold(green(getCommand(packageManager, 'lint')))}`)
+  console.log(`  ${bold(green(getCommand(packageManager, 'format')))}`)
+  console.log()
+
+  if (projectType === 'monorepo') {
+    // console.log(`  ${bold(green(getCommand(packageManager, 'changeset')))}`)
+    // console.log(`  ${bold(green(getCommand(packageManager, 'release')))}`)
+    console.log(
+      `${bold(
+        yellow(
+          `To enable Turborepo Remote Cache, don't forget to put your settings inside ${fullProjectDir}/.turbo/config.json file.`,
+        ),
+      )}`,
+    )
+  }
 }
 // common deps: @types/node, typescript, vitest, @vitest/coverage-istanbul, rome, coveralls, lint-staged, husky
 // libs dev deps: common deps, tsup
