@@ -4,8 +4,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup-node",
-    "lint": "tsc --noEmit && rome check ."
+    "build": "tsc --noEmit && tsup-node"
   },
   "devDependencies": {
     "tsup": "^6.5.0"

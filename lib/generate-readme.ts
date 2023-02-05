@@ -19,7 +19,7 @@ export default function generateReadme({
 ${commandFor('install')}
 \`\`\`
 
-### Type-Check Compile and Minify for Production
+### Type-Check Compile for Production
 
 \`\`\`sh
 ${commandFor('build')}
@@ -27,7 +27,7 @@ ${commandFor('build')}
 `
   if (projectType === 'app') {
     npmScriptsDescriptions += `
-### Compile and Hot-Reload for Development
+### Hot-Reload for Development
 
 \`\`\`sh
 ${commandFor('dev')}
@@ -43,10 +43,13 @@ ${commandFor('test')}
 `
 
   npmScriptsDescriptions += `
-### Lint with [Rome](https://rome.tools/)
+### Lint and Format with [Rome](https://rome.tools/)
+
+Linting will also check types using [tsc](https://www.typescriptlang.org/).
 
 \`\`\`sh
 ${commandFor('lint')}
+${commandFor('format')}
 \`\`\`
 `
 
