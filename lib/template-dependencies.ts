@@ -1,7 +1,6 @@
 const BASE_DEV_DEPENDENCIES = [
   '@types/node',
   '@vitest/coverage-istanbul',
-  'husky',
   'lint-staged',
   'rome',
   'typescript',
@@ -31,6 +30,15 @@ const LIB_DEV_DEPENDENCIES = new Set<string>(
 
 const LIB_DEPENDENCIES = new Set<string>(BASE_DEPENDENCIES)
 
+const MONOREPO_DEV_DEPENDENCIES = new Set<string>(BASE_DEPENDENCIES.concat(
+  [
+    '@changesets/changelog-github',
+    '@changesets/cli',
+    '@changesets/changelog-github',
+    'turbo',
+  ]
+))
+
 export const dependenciesByTemplate = new Map([
   [
     'lib', {
@@ -42,6 +50,11 @@ export const dependenciesByTemplate = new Map([
     'app', {
       dependencies: LIB_DEPENDENCIES,
       devDependencies: LIB_DEV_DEPENDENCIES,
+    }
+  ],
+  [
+    'with-husky', {
+      devDependencies: new Set<string>(['husky']),
     }
   ]
 ])
