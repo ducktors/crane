@@ -38,13 +38,13 @@ function renderTemplate(src: string, dest: string) {
     // merge instead of overwriting
     const existing = JSON.parse(readFileSync(dest, 'utf8'))
     const newPackage = JSON.parse(readFileSync(src, 'utf8'))
-    const pkg = sortProperties(deepMerge(existing, newPackage))
-    const cliPackage = JSON.parse(readFileSync('package.json', 'utf8'))
     const templateName = dirname(src).split(sep).at(-1)
-    if (!['base', 'with-husky'].includes(templateName!)) {
-      pkg.dependencies = generateDependencies(cliPackage, dependenciesByTemplate.get(templateName!)!.dependencies)
-      pkg.devDependencies = generateDependencies(cliPackage, dependenciesByTemplate.get(templateName!)!.devDependencies)
+    const cliPackage = JSON.parse(readFileSync('package.json', 'utf8'))
+    if (templateName) {
+      newPackage.devDependencies = generateDependencies(cliPackage, dependenciesByTemplate.get(templateName)?.devDependencies)
+      newPackage.dependencies = generateDependencies(cliPackage, dependenciesByTemplate.get(templateName)?.dependencies)
     }
+    const pkg = sortProperties(deepMerge(existing, newPackage))
     writeFileSync(dest, JSON.stringify(pkg, null, 2) + '\n')
     return
   }
