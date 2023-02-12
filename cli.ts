@@ -98,11 +98,11 @@ async function cli() {
         },
         {
           name: 'packageName',
-          type: () => (isValidPackageName(projectDir) ? null : 'text'),
+          type: 'text',
           message: 'Package name:',
           initial: () => toValidPackageName(projectDir),
-          validate: (dir) =>
-            isValidPackageName(dir) || 'Invalid package.json name',
+          validate: (name) =>
+            isValidPackageName(name) || 'Invalid package.json name',
         },
         {
           name: 'projectType',
