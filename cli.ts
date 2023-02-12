@@ -16,6 +16,7 @@ import { getUserAgent } from './lib/get-user-agent'
 import { renderWithHusky } from './lib/render-wtih-husky'
 import { canSkipEmptying } from './lib/can-skip-emptying'
 import { emptyDir } from './lib/empty-dir'
+import { renderWithActions } from './lib/render-wtih-actions'
 
 function isValidPackageName(projectName: string) {
   return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(
@@ -39,6 +40,7 @@ function toValidPackageName(projectName: string) {
 // --monorepo
 // --force (for force overwriting)
 // --git (for git init)
+// --actions (for github actions)
 const argv = minimist(process.argv.slice(2), {
   string: ['_'],
   boolean: true,
@@ -60,6 +62,7 @@ async function cli() {
     force?: boolean
     projectType?: 'app' | 'lib'
     initGit?: boolean
+    actions?: boolean
   } = {}
   try {
     console.log()
@@ -129,6 +132,11 @@ async function cli() {
           type: () => (argv.git ? null : 'confirm'),
           message: 'Do you want to initialize git?',
         },
+        {
+          name: 'actions',
+          type: (prev) => (argv.actions || !prev ? null : 'confirm'),
+          message: 'Do you want to add GH actions?',
+        },
       ],
       {
         onCancel: () => {
@@ -149,6 +157,7 @@ async function cli() {
       (argv.lib && 'lib') ||
       (argv.monorepo && 'monorepo'),
     initGit = argv.git,
+    actions = argv.actions,
   } = result
   const fullProjectDir = join(cwd, projectDir)
 
@@ -200,6 +209,9 @@ async function cli() {
   // render husky only at top root level project dir
   if (initGit) {
     renderWithHusky(templateRoot, fullProjectDir)
+    if (actions) {
+      renderWithActions(templateRoot, fullProjectDir)
+    }
     await gitInitRepo(fullProjectDir)
   }
 
