@@ -20,7 +20,6 @@
 __WIP__
 - [ ] GitHub workflows
 - [ ] Coveralls
-- [ ] lint-staged
 - [ ] conventional commits
 - [ ] commitlint
 - [ ] semantic release for non-monorepo
