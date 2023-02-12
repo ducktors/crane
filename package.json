@@ -21,19 +21,19 @@
   "dependencies": {
     "execa": "^6.1.0",
     "kolorist": "^1.7.0",
-    "minimist": "^1.2.7",
+    "minimist": "^1.2.8",
     "prompts": "^2.4.2",
     "tslib": "^2.5.0"
   },
   "devDependencies": {
     "@ducktors/tsconfig": "^0.1.1",
     "@types/minimist": "^1.2.2",
-    "@types/node": "^16.18.11",
+    "@types/node": "^16.18.12",
     "@types/prompts": "^2.4.2",
     "@types/yargs-parser": "^21.0.0",
     "rome": "^11.0.0",
     "tsup": "^6.6.0",
-    "tsx": "^3.12.2",
+    "tsx": "^3.12.3",
     "typescript": "^4.9.5",
     "vitest": "^0.28.4"
   }
