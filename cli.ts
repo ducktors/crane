@@ -38,6 +38,7 @@ function toValidPackageName(projectName: string) {
 // --help
 // --monorepo
 // --force (for force overwriting)
+// --git (for git init)
 const argv = minimist(process.argv.slice(2), {
   string: ['_'],
   boolean: true,
@@ -45,7 +46,7 @@ const argv = minimist(process.argv.slice(2), {
 
 const cwd = process.cwd()
 let projectDir = argv._[0]
-const defaultProjectName = projectDir ?? 'my-project'
+const defaultProjectName = projectDir
 
 if ([argv.app, argv.lib, argv.monorepo].filter(Boolean).length > 1) {
   console.log(red('✖'), 'Cannot specify both --app and --lib')
@@ -58,6 +59,7 @@ async function cli() {
     packageName?: string
     force?: boolean
     projectType?: 'app' | 'lib'
+    initGit?: boolean
   } = {}
   try {
     console.log()
@@ -73,6 +75,7 @@ async function cli() {
           initial: defaultProjectName,
           onState: (state) =>
             (projectDir = String(state.value).trim() || defaultProjectName),
+          validate: (value) => (!value ? 'Project name is required' : true),
         },
         {
           name: 'force',
@@ -121,6 +124,11 @@ async function cli() {
           ],
           initial: 0,
         },
+        {
+          name: 'initGit',
+          type: () => (argv.git ? null : 'confirm'),
+          message: 'Do you want to initialize git?',
+        },
       ],
       {
         onCancel: () => {
@@ -140,6 +148,7 @@ async function cli() {
     projectType = (argv.app && 'app') ||
       (argv.lib && 'lib') ||
       (argv.monorepo && 'monorepo'),
+    initGit = argv.git,
   } = result
   const fullProjectDir = join(cwd, projectDir)
 
@@ -189,7 +198,10 @@ async function cli() {
   }
 
   // render husky only at top root level project dir
-  renderWithHusky(templateRoot, fullProjectDir)
+  if (initGit) {
+    renderWithHusky(templateRoot, fullProjectDir)
+    await gitInitRepo(fullProjectDir)
+  }
 
   const packageManager = getUserAgent(projectType === 'monorepo')
   renderReadme(
@@ -198,8 +210,6 @@ async function cli() {
     projectType,
     fullProjectDir,
   )
-
-  await gitInitRepo(fullProjectDir)
 
   console.log(
     `\n${green('✔')} ${yellow('Crane')} Scaffolding complete. Now run:\n`,
