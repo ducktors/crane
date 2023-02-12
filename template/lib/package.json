@@ -1,9 +1,9 @@
 {
-  "private": true,
   "files": [
     "dist"
   ],
   "scripts": {
+    "prepublish": "pnpm build",
     "build": "tsc --noEmit && tsup-node"
   },
   "devDependencies": {

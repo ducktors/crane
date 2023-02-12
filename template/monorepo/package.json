@@ -1,4 +1,5 @@
 {
+  "private": true,
   "scripts": {
     "build": "turbo build --color",
     "dev": "turbo dev --color",
