@@ -29,10 +29,10 @@
     },
     "test": {
       "outputs": [],
+      "cache": false,
       "dependsOn": [
         "^build"
-      ],
-      "cache": false
+      ]
     },
     "test:ci": {
       "outputs": [],
