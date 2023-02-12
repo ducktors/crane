@@ -16,10 +16,10 @@
 
 
 ## Opinionated Ducktors' Project Generator
+[![Coverage Status](https://coveralls.io/repos/github/ducktors/crane/badge.svg?branch=add-coveralls)](https://coveralls.io/github/ducktors/crane?branch=add-coveralls)
 
 __WIP__
-- [ ] GitHub workflows
-- [ ] Coveralls
+- [ ] GitHub release workflows
 - [ ] conventional commits
 - [ ] commitlint
 - [ ] semantic release for non-monorepo

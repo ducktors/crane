@@ -9,6 +9,7 @@ export default defineConfig({
       reporter: ['lcovonly', 'text-summary'],
       provider: 'istanbul',
       include: ['**/*.{ts,tsx}'],
+      exclude: ['template/**/*.{ts,tsx}'],
     },
   },
 })
