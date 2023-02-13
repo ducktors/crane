@@ -35,6 +35,7 @@
     "@changesets/cli": "^2.26.0",
     "@commitlint/cli": "^17.1.2",
     "@commitlint/config-conventional": "^17.1.0",
+    "@commitlint/lint": "^17.4.3",
     "@commitlint/prompt": "^17.1.2",
     "@ducktors/tsconfig": "^0.1.1",
     "@types/minimist": "^1.2.2",

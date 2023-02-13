@@ -5,6 +5,7 @@ specifiers:
   '@changesets/cli': ^2.26.0
   '@commitlint/cli': ^17.1.2
   '@commitlint/config-conventional': ^17.1.0
+  '@commitlint/lint': ^17.4.3
   '@commitlint/prompt': ^17.1.2
   '@ducktors/tsconfig': ^0.1.1
   '@types/minimist': ^1.2.2
@@ -41,6 +42,7 @@ devDependencies:
   '@changesets/cli': 2.26.0
   '@commitlint/cli': 17.4.3
   '@commitlint/config-conventional': 17.4.3
+  '@commitlint/lint': 17.4.3
   '@commitlint/prompt': 17.4.3
   '@ducktors/tsconfig': 0.1.1_typescript@4.9.5
   '@types/minimist': 1.2.2
@@ -50,7 +52,7 @@ devDependencies:
   '@vitest/coverage-istanbul': 0.28.4
   commitizen: 4.3.0
   commitlint-config-cz: 0.13.3
-  commitlint-plugin-function-rules: 1.7.1
+  commitlint-plugin-function-rules: 1.7.1_@commitlint+lint@17.4.3
   cz-conventional-changelog: 3.3.0
   husky: 8.0.3
   lint-staged: 13.1.1
@@ -1832,11 +1834,13 @@ packages:
       lodash.clonedeep: 4.5.0
     dev: true
 
-  /commitlint-plugin-function-rules/1.7.1:
+  /commitlint-plugin-function-rules/1.7.1_@commitlint+lint@17.4.3:
     resolution: {integrity: sha512-hGLShcCM3my+q3unMoznSfV23JmpJ/R8aHQ5KGzxVwv3HFpDS4cFWraCdBRAkMbL1UzUrVOEutG4EDur5S7AsA==}
     engines: {node: '>=12'}
     peerDependencies:
       '@commitlint/lint': '>=9.1.2 <18'
+    dependencies:
+      '@commitlint/lint': 17.4.3
     dev: true
 
   /compare-func/2.0.0:
