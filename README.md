@@ -16,7 +16,7 @@
 
 
 ## Opinionated Ducktors' Project Generator
-[![GitHub package.json version](https://img.shields.io/github/package-json/v/ducktors/crane)](https://github.com/ducktors/crane/releases) [![npm](https://img.shields.io/npm/dt/create-crane)](https://www.npmjs.com/package/create-crane) [![CI](https://github.com/ducktors/crane/actions/workflows/ci.yml/badge.svg)](https://github.com/ducktors/crane/actions/workflows/ci.yml) [![Changeset](https://github.com/ducktors/crane/actions/workflows/changeset.yml/badge.svg)](https://github.com/ducktors/crane/actions/workflows/changeset.yml) [![Coverage Status](https://coveralls.io/repos/github/ducktors/crane/badge.svg?branch=add-coveralls)](https://coveralls.io/github/ducktors/crane?branch=add-coveralls)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/ducktors/crane)](https://github.com/ducktors/crane/releases) [![npm](https://img.shields.io/npm/dt/create-crane)](https://www.npmjs.com/package/create-crane) [![CI](https://github.com/ducktors/crane/actions/workflows/ci.yml/badge.svg)](https://github.com/ducktors/crane/actions/workflows/ci.yml) [![Changeset](https://github.com/ducktors/crane/actions/workflows/changeset.yml/badge.svg)](https://github.com/ducktors/crane/actions/workflows/changeset.yml) [![Coverage Status](https://coveralls.io/repos/github/ducktors/crane/badge.svg?branch=add-coveralls)](https://coveralls.io/github/ducktors/crane?branch=add-coveralls) [![Maintainability](https://api.codeclimate.com/v1/badges/1e471aa8892490e48feb/maintainability)](https://codeclimate.com/github/ducktors/crane/maintainability)
 
 
 ### Changesets
