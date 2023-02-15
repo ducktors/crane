@@ -26,6 +26,4 @@ They work out of the box thanks to the with-changesets preset. However, you need
 
 __WIP__
 - [ ] crane import: adds crane structure to an existing repository
-- [ ] conventional commits
-- [ ] commitlint
 
