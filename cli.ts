@@ -1,4 +1,4 @@
-#!/bin/env node
+#!/usr/bin/env node
 import { existsSync, mkdirSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 
