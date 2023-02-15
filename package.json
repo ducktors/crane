@@ -1,5 +1,5 @@
 {
-  "name": "@ducktors/crane",
+  "name": "create-crane",
   "version": "0.0.1",
   "description": "",
   "main": "cli.js",

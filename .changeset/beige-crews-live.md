@@ -1,5 +1,5 @@
 ---
-"@ducktors/crane": minor
+"create-crane": minor
 ---
 
 initial release
