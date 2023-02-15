@@ -2,7 +2,6 @@ name: CI
 
 on:
   merge_group:
-  pull_request:
   push:
 
 concurrency:
@@ -10,6 +9,25 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  commitlint:
+    name: Commit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Remove tsconfig.json
+        run: rm tsconfig.json # https://github.com/wagoid/commitlint-github-action/issues/560#issuecomment-1277659864
+
+      - name: Check commit message
+        uses: wagoid/commitlint-github-action@v5
+        with:
+          configFile: commitlint.config.js
+          failOnWarnings: false
+          helpURL: https://github.com/ducktors/turborepo-remote-cache#how-to-commit
+
   build:
     runs-on: ${{ matrix.os }}
     name: Build
@@ -34,6 +52,7 @@ jobs:
         run: pnpm lint
       - name: Build
         run: pnpm build
+
   test:
     runs-on: ubuntu-latest
     name: Test
@@ -43,14 +62,33 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - uses: pnpm/action-setup@v2
         with:
-          version: 7.27.0
-      - name: Install with pnpm
-        run: pnpm install
+          version: 7
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Run tests
         run: pnpm test:ci
+
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          path-to-lcov: ./coverage/lcov.info

@@ -1,5 +1,5 @@
 {
-  "name": "@ducktors/crane",
+  "name": "create-crane",
   "version": "0.0.1",
   "description": "",
   "main": "cli.js",
@@ -14,7 +14,9 @@
     "lint": "tsc --noemit && rome check .",
     "format": "rome format --write .",
     "test": "vitest run",
-    "test:ci": "vitest run --reporter=junit --reporter=default --coverage"
+    "test:ci": "vitest run --reporter=junit --reporter=default --coverage",
+    "release": "pnpm build && changeset publish",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "Ducktors <your@ducktors.dev> (https://ducktors.dev)",
@@ -27,12 +29,20 @@
     "tslib": "^2.5.0"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/cli": "^2.26.0",
+    "@commitlint/cli": "^17.1.2",
+    "@commitlint/config-conventional": "^17.1.0",
+    "@commitlint/lint": "^17.4.3",
+    "@commitlint/prompt": "^17.1.2",
     "@ducktors/tsconfig": "^0.1.1",
     "@types/minimist": "^1.2.2",
     "@types/node": "^16.18.12",
     "@types/prompts": "^2.4.2",
     "@types/yargs-parser": "^21.0.0",
     "@vitest/coverage-istanbul": "^0.28.4",
+    "commitlint-config-cz": "^0.13.3",
+    "commitlint-plugin-function-rules": "^1.7.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.1.1",
     "rome": "^11.0.0",

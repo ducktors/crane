@@ -18,9 +18,12 @@
 ## Opinionated Ducktors' Project Generator
 [![Coverage Status](https://coveralls.io/repos/github/ducktors/crane/badge.svg?branch=add-coveralls)](https://coveralls.io/github/ducktors/crane?branch=add-coveralls)
 
+
+
+
+### Changesets
+They work out of the box thanks to the with-changesets preset. However, you need to add the changesets-bot to your repo manually. You can do that by going to the [GitHub Marketplace](https://github.com/apps/changeset-bot)
+
 __WIP__
-- [ ] GitHub release workflows
-- [ ] conventional commits
-- [ ] commitlint
-- [ ] semantic release for non-monorepo
-- [ ] changesets for monorepo
+- [ ] crane import: adds crane structure to an existing repository
+

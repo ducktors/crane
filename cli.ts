@@ -17,6 +17,7 @@ import { renderWithHusky } from './lib/render-wtih-husky'
 import { canSkipEmptying } from './lib/can-skip-emptying'
 import { emptyDir } from './lib/empty-dir'
 import { renderWithActions } from './lib/render-wtih-actions'
+import { renderWithChangesets } from './lib/render-wtih-changesets'
 
 function isValidPackageName(projectName: string) {
   return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(
@@ -41,6 +42,7 @@ function toValidPackageName(projectName: string) {
 // --force (for force overwriting)
 // --git (for git init)
 // --actions (for github actions)
+// --changesets (for changesets)
 const argv = minimist(process.argv.slice(2), {
   string: ['_'],
   boolean: true,
@@ -63,6 +65,7 @@ async function cli() {
     projectType?: 'app' | 'lib'
     initGit?: boolean
     actions?: boolean
+    changesets?: boolean
   } = {}
   try {
     console.log()
@@ -95,11 +98,11 @@ async function cli() {
         },
         {
           name: 'packageName',
-          type: () => (isValidPackageName(projectDir) ? null : 'text'),
+          type: 'text',
           message: 'Package name:',
           initial: () => toValidPackageName(projectDir),
-          validate: (dir) =>
-            isValidPackageName(dir) || 'Invalid package.json name',
+          validate: (name) =>
+            isValidPackageName(name) || 'Invalid package.json name',
         },
         {
           name: 'projectType',
@@ -126,6 +129,12 @@ async function cli() {
             },
           ],
           initial: 0,
+        },
+        {
+          name: 'changesets',
+          type: (prev) =>
+            argv.changesets || prev === 'monorepo' ? null : 'confirm',
+          message: 'Do you want to add Changesets?',
         },
         {
           name: 'initGit',
@@ -158,6 +167,7 @@ async function cli() {
       (argv.monorepo && 'monorepo'),
     initGit = argv.git,
     actions = argv.actions,
+    changesets = argv.changesets,
   } = result
   const fullProjectDir = join(cwd, projectDir)
 
@@ -204,6 +214,10 @@ async function cli() {
     renderLib(templateRoot, packageName, fullProjectDir)
   } else if (projectType === 'monorepo') {
     renderMonorepo(templateRoot, packageName, fullProjectDir)
+  }
+
+  if (changesets || projectType === 'monorepo') {
+    renderWithChangesets(templateRoot, fullProjectDir)
   }
 
   // render husky only at top root level project dir
