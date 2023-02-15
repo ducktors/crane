@@ -1,5 +1,11 @@
 # create-crane
 
+## 0.1.2
+
+### Patch Changes
+
+- 78b84dd: fix: use correct shebang value
+
 ## 0.1.1
 
 ### Patch Changes
