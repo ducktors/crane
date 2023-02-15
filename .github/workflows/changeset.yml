@@ -41,6 +41,8 @@ jobs:
         uses: changesets/action@v1
         with:
           publish: pnpm release
+          commit: 'chore: version release'
+          title: 'chore: version release'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.DUCKTORS_NPM_TOKEN }}
