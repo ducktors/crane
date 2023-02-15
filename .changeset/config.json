@@ -8,8 +8,6 @@
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [],
-  "commit": "chore: version release",
-  "title": "chore: version release",
   "privatePackages": {
     "version": true,
     "tag": true
