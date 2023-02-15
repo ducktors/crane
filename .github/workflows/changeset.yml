@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: Release
+    name: Changeset
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
