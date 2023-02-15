@@ -16,8 +16,6 @@
     "test": "vitest run",
     "test:ci": "vitest run --reporter=junit --reporter=default --coverage",
     "release": "pnpm build && changeset publish",
-    "commitlint": "commitlint",
-    "commit": "npx git-cz",
     "prepare": "husky install"
   },
   "keywords": [],

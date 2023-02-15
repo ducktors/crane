@@ -18,7 +18,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - run: rm tsconfig.json # https://github.com/wagoid/commitlint-github-action/issues/560#issuecomment-1277659864
+      - name: Remove tsconfig.json
+        run: rm tsconfig.json # https://github.com/wagoid/commitlint-github-action/issues/560#issuecomment-1277659864
 
       - name: Check commit message
         uses: wagoid/commitlint-github-action@v5
