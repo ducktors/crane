@@ -1,4 +1,4 @@
-name: Changeset
+name: Changesets
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: Changeset
+    name: Changesets
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -42,7 +42,7 @@ jobs:
         with:
           publish: pnpm release
           commit: "chore: version release"
-          title: "chore: version release"
+          title: "Version Release"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.DUCKTORS_NPM_TOKEN }}
