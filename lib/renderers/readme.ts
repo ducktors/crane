@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import generateReadme from './generate-readme'
+import generateReadme from '../generate-readme'
 
 export function renderReadme(
   packageManager: string,

@@ -1,5 +1,5 @@
 import { resolve } from 'node:path'
-import renderTemplate from './render-template'
+import renderTemplate from './template'
 
 export function render(
   templateRoot: string,
