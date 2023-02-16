@@ -1,11 +1,10 @@
-import { bold, green, red, yellow } from 'kolorist'
 import { rmdirSync } from 'node:fs'
+import { bold, green, red, yellow } from 'picocolors'
 
 export async function gitInitRepo(destFolder: string) {
   try {
     const { execa } = await import('execa')
     await execa('git', ['init'], { cwd: destFolder })
-    console.log(`\n${green('✔')} ${yellow('Crane')} Git repo initialized.`)
   } catch (err: any) {
     console.error(err)
     console.log(

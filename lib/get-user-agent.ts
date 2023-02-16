@@ -1,7 +1,4 @@
-export function getUserAgent(isMonorepo: boolean) {
-  if (isMonorepo) {
-    return 'pnpm'
-  }
+export function getUserAgent() {
   const userAgent = process.env.npm_config_user_agent ?? ''
   const packageManager = /pnpm/.test(userAgent)
     ? 'pnpm'

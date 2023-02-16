@@ -10,8 +10,8 @@ import {
 } from 'node:fs'
 import { basename, resolve, dirname } from 'node:path'
 
-import { deepMerge } from './deep-merge'
-import { sortProperties } from './sort-properties'
+import { deepMerge } from '../deep-merge'
+import { sortProperties } from '../sort-properties'
 
 function renderTemplate(src: string, dest: string) {
   const stats = statSync(src)

@@ -1,12 +1,12 @@
 import { render } from './render'
-import { renderPackageJson } from './render-package-json'
+import { renderPackageJson } from './package-json'
 
-export function renderLib(
+export function renderApp(
   templateRoot: string,
   packageName: string,
   destFolder: string,
 ) {
   renderPackageJson(packageName, destFolder)
   render(templateRoot, 'base', destFolder)
-  render(templateRoot, 'lib', destFolder)
+  render(templateRoot, 'app', destFolder)
 }

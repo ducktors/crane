@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "prepare": "husky install",
     "build": "turbo build --color",
     "dev": "turbo dev --color",
     "test": "turbo run test",

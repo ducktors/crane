@@ -1,8 +1,8 @@
 import { mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { render } from './render'
-import { renderApp } from './render-app'
-import { renderLib } from './render-lib'
+import { renderApp } from './app'
+import { renderLib } from './lib'
 
 export function renderMonorepo(
   templateRoot: string,
