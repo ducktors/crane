@@ -1,5 +1,11 @@
 # create-crane
 
+## 0.2.1
+
+### Patch Changes
+
+- 4c1064d: fix: add template folder
+
 ## 0.2.0
 
 ### Minor Changes
