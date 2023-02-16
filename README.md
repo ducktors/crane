@@ -24,4 +24,7 @@ They work out of the box thanks to the with-changesets preset. However, you need
 
 __WIP__
 - [ ] crane import: adds crane structure to an existing repository
+- [ ] conventional commits and commitlint in templates
+- [ ] make coveralls coverage work in monorepo (lcov merge)
+- [ ] ISSUE_TEMPLATE/PULL_REQUEST_TEMPLATE
 

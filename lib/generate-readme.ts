@@ -3,11 +3,10 @@ import { getCommand } from './get-command'
 
 export default function generateReadme({
   projectName,
-  packageManager,
   projectType,
-}: { projectName: string; packageManager: string; projectType: string }) {
+}: { projectName: string; projectType: string }) {
   const commandFor = (scriptName: string, args?: string) =>
-    getCommand(packageManager, scriptName, args)
+    getCommand('pnpm', scriptName, args)
 
   let readme = `# ${projectName}
 

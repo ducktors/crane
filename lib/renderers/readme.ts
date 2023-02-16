@@ -3,7 +3,6 @@ import { resolve } from 'node:path'
 import generateReadme from '../generate-readme'
 
 export function renderReadme(
-  packageManager: string,
   projectName: string,
   projectType: string,
   destFolder: string,
@@ -12,7 +11,6 @@ export function renderReadme(
     resolve(destFolder, 'README.md'),
     generateReadme({
       projectName,
-      packageManager,
       projectType,
     }),
   )
