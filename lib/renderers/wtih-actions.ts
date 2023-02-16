@@ -1,5 +1,11 @@
 import { render } from './render'
 
-export function renderWithActions(templateRoot: string, destFolder: string) {
-  render(templateRoot, 'with-actions', destFolder)
+type RepositoryType = 'standalone' | 'monorepo'
+
+export function renderWithActions(
+  templateRoot: string,
+  destFolder: string,
+  repositoryType: RepositoryType,
+) {
+  render(templateRoot, `with-actions/${repositoryType}`, destFolder)
 }

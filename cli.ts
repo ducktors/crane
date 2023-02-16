@@ -18,21 +18,10 @@ import { gitInitRepo } from './lib/git-init-repo'
 import { getUserAgent } from './lib/get-user-agent'
 import { canSkipEmptying } from './lib/can-skip-emptying'
 import { emptyDir } from './lib/empty-dir'
-
-function isValidPackageName(projectName: string) {
-  return /^(?:@[a-z0-9-*~][a-z0-9-*._~]*\/)?[a-z0-9-~][a-z0-9-._~]*$/.test(
-    projectName,
-  )
-}
-
-function toValidPackageName(projectName: string) {
-  return projectName
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/^[._]/, '')
-    .replace(/[^a-z0-9-~]+/g, '-')
-}
+import {
+  isValidPackageName,
+  toValidPackageName,
+} from './lib/package-name-utils'
 
 // possible options:
 // --lib
@@ -224,7 +213,7 @@ async function cli() {
   if (initGit) {
     renderWithHusky(templateRoot, fullProjectDir)
     if (actions) {
-      renderWithActions(templateRoot, fullProjectDir)
+      renderWithActions(templateRoot, fullProjectDir, 'standalone')
     }
     await gitInitRepo(fullProjectDir)
   }
