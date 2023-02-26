@@ -23,8 +23,7 @@
 They work out of the box thanks to the with-changesets preset. However, you need to add the changesets-bot to your repo manually. You can do that by going to the [GitHub Marketplace](https://github.com/apps/changeset-bot)
 
 __WIP__
-- [ ] crane import: adds crane structure to an existing repository
-- [ ] conventional commits and commitlint in templates
+- [ ] crane inject: adds crane structure to an existing repository
 - [ ] make coveralls coverage work in monorepo (lcov merge)
-- [ ] ISSUE_TEMPLATE/PULL_REQUEST_TEMPLATE
-
+- [ ] generate correct readme files based on project type
+- [ ] documentation

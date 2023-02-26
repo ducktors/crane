@@ -2,10 +2,10 @@ import { render } from './render'
 
 type RepositoryType = 'standalone' | 'monorepo'
 
-export function renderWithActions(
+export function renderWithGH(
   templateRoot: string,
   destFolder: string,
   repositoryType: RepositoryType,
 ) {
-  render(templateRoot, `with-actions/${repositoryType}`, destFolder)
+  render(templateRoot, `with-gh/${repositoryType}`, destFolder)
 }

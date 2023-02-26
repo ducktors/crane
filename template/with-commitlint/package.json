@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
+    "@commitlint/lint": "^17.4.4",
+    "@commitlint/prompt": "^17.4.4",
+    "commitlint-plugin-function-rules": "^1.7.1"
+  }
+}

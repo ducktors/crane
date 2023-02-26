@@ -9,7 +9,7 @@ import { renderLib } from './lib/renderers/lib'
 import { renderMonorepo } from './lib/renderers/monorepo'
 import { renderWithChangesets } from './lib/renderers/wtih-changesets'
 import { renderWithHusky } from './lib/renderers/wtih-husky'
-import { renderWithActions } from './lib/renderers/wtih-actions'
+import { renderWithGH } from './lib/renderers/wtih-gh'
 import { gitInitRepo } from './lib/git-init-repo'
 import { renderReadme } from './lib/renderers/readme'
 import { getCommand } from './lib/get-command'
@@ -205,7 +205,10 @@ async function scaffold({
       if (initActions) {
         const spinnerActions = spinner()
         spinnerActions.start('Adding GitHub actions...')
-        renderWithActions(templateRoot, fullProjectDir, 'standalone')
+        renderWithGH(templateRoot, fullProjectDir, 'standalone')
+        if (projectType === 'monorepo') {
+          renderWithGH(templateRoot, fullProjectDir, 'monorepo')
+        }
         spinnerActions.stop('GitHub actions added')
       }
       const spinnerGit = spinner()
