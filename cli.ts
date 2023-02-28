@@ -16,6 +16,7 @@ import { getCommand } from './lib/get-command'
 import { askInstallDeps, runPrompt } from './lib/run-prompt'
 import { installDeps } from './lib/inistall-deps'
 import { ensurePnpm } from './lib/ensure-pnpm'
+import { renderWithCommitlint } from './lib/renderers/with-commitlint'
 
 // possible options:
 // --lib
@@ -27,11 +28,22 @@ import { ensurePnpm } from './lib/ensure-pnpm'
 // --git (for git init)
 // --actions (for github actions)
 // --changesets (for changesets)
-const { _, lib, app, monorepo, force, inject, git, actions, changesets } =
-  minimist(process.argv.slice(2), {
-    string: ['_'],
-    boolean: true,
-  })
+// --commitlint (for commitlint)
+const {
+  _,
+  lib,
+  app,
+  monorepo,
+  force,
+  inject,
+  git,
+  actions,
+  changesets,
+  commitlint,
+} = minimist(process.argv.slice(2), {
+  string: ['_'],
+  boolean: true,
+})
 
 const cwd = process.cwd()
 const projectDir = _[0]
@@ -58,6 +70,7 @@ async function main() {
     projectType,
     initChangesets,
     initGit,
+    initCommitLint,
     initActions,
   } = await runPrompt({
     projectDir: defaultProjectDir,
@@ -68,11 +81,11 @@ async function main() {
     inject,
     changesets,
     git,
+    commitlint,
     actions,
   })
 
   const fullProjectDir = join(cwd, projectDir)
-
   const projectAlreadyExists = existsSync(fullProjectDir)
 
   if (projectAlreadyExists) {
@@ -90,6 +103,7 @@ async function main() {
     projectType,
     initChangesets,
     initGit,
+    initCommitLint,
     initActions,
   })
 
@@ -165,14 +179,16 @@ async function scaffold({
   packageName,
   initChangesets,
   initGit,
+  initCommitLint,
   initActions,
 }: {
   fullProjectDir: string
   existingProject: 'force' | 'inject' | 'skip'
   projectType: 'app' | 'lib' | 'monorepo' | 'monorepo-app' | 'monorepo-lib'
-  packageName: string
+  packageName: string | undefined
   initChangesets: boolean
   initGit: boolean
+  initCommitLint: boolean
   initActions: boolean
 }) {
   try {
@@ -183,11 +199,23 @@ async function scaffold({
     const templateRoot = resolve(__dirname, 'template')
 
     if (projectType === 'app' || projectType === 'monorepo-app') {
-      await renderApp(templateRoot, packageName, fullProjectDir, projectType)
+      await renderApp(
+        templateRoot,
+        packageName,
+        fullProjectDir,
+        projectType,
+        existingProject,
+      )
     } else if (projectType === 'lib' || projectType === 'monorepo-lib') {
-      await renderLib(templateRoot, packageName, fullProjectDir, projectType)
+      await renderLib(
+        templateRoot,
+        packageName,
+        fullProjectDir,
+        projectType,
+        existingProject,
+      )
     } else if (projectType === 'monorepo') {
-      await renderMonorepo(templateRoot, fullProjectDir)
+      await renderMonorepo(templateRoot, fullProjectDir, existingProject)
     }
     s.stop('Base scaffolding complete')
 
@@ -204,6 +232,14 @@ async function scaffold({
       spinnerHusky.start('Adding husky...')
       renderWithHusky(templateRoot, fullProjectDir)
       spinnerHusky.stop('husky added')
+
+      if (initCommitLint) {
+        const spinnerCommitLint = spinner()
+        spinnerCommitLint.start('Adding commitlint...')
+        renderWithCommitlint(templateRoot, fullProjectDir)
+        spinnerCommitLint.stop('commitlint added')
+      }
+
       if (initActions) {
         const spinnerActions = spinner()
         spinnerActions.start('Adding GitHub actions...')
@@ -213,6 +249,7 @@ async function scaffold({
         }
         spinnerActions.stop('GitHub actions added')
       }
+
       const spinnerGit = spinner()
       spinnerGit.start('Initializing git...')
       await gitInitRepo(fullProjectDir)
@@ -221,7 +258,12 @@ async function scaffold({
 
     const spinnerReadme = spinner()
     spinnerReadme.start('Rendering README...')
-    renderReadme(packageName ?? defaultProjectDir, projectType, fullProjectDir)
+    renderReadme(
+      packageName ?? defaultProjectDir,
+      projectType,
+      fullProjectDir,
+      existingProject,
+    )
     spinnerReadme.stop('README rendered')
   } catch (e) {
     const actionMessage = existingProject === 'inject' ? 'inject' : 'scaffold'
