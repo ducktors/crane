@@ -24,13 +24,13 @@ export async function runPrompt({
   git?: boolean
   actions?: boolean
 }) {
-  const projectName = await askProjectName({ projectDir })
+  const chosenProjectDir = await askProjectDir({ projectDir })
   const existingProject = await askExistingProject({
-    projectName,
+    projectName: chosenProjectDir,
     force,
     inject,
   })
-  const packageName = await askPackageName({ projectName })
+  const packageName = await askPackageName({ projectDir: chosenProjectDir })
   const projectType = await askProjectType({
     app,
     lib,
@@ -40,12 +40,12 @@ export async function runPrompt({
     projectType,
     changesets,
   })
-  const initGit = await askInitGit({ git })
-  const initActions = await askActions({ actions })
+  const initGit = await askInitGit({ git, projectType })
+  const initActions = await askActions({ actions, projectType })
 
   return {
-    projectName,
-    existingProject,
+    projectDir: chosenProjectDir,
+    existingProject: existingProject as 'force' | 'inject' | 'skip',
     packageName,
     projectType,
     initChangesets,
@@ -54,20 +54,20 @@ export async function runPrompt({
   }
 }
 
-async function askProjectName({ projectDir }: { projectDir?: string } = {}) {
-  const projectName = projectDir?.trim()
+async function askProjectDir({ projectDir }: { projectDir?: string } = {}) {
+  const trimmedProjectDir = projectDir?.trim()
 
-  if (projectName) {
-    return projectName
+  if (trimmedProjectDir) {
+    return trimmedProjectDir
   }
 
   const answer = await text({
-    message: 'Project name:',
+    message: 'Project Directory:',
     placeholder: projectDir,
     initialValue: projectDir,
     validate(value) {
       if (!value) {
-        return 'Project name is required'
+        return 'Project Directory is required'
       }
     },
   })
@@ -127,8 +127,8 @@ async function askExistingProject({
   return existingProject
 }
 
-async function askPackageName({ projectName }: { projectName?: string }) {
-  const initialValue = projectName ? toValidPackageName(projectName) : undefined
+async function askPackageName({ projectDir }: { projectDir?: string }) {
+  const initialValue = projectDir ? toValidPackageName(projectDir) : undefined
   const packageName = await text({
     message: 'Package name:',
     initialValue,
@@ -177,6 +177,16 @@ async function askProjectType({
         label: 'Monorepo',
         hint: 'Choose this if you want to create a pnpm and Turborepo monorepo.',
       },
+      {
+        value: 'monorepo-app',
+        label: 'Monorepo Application',
+        hint: 'Choose this if you want to add a new application to a monorepo.',
+      },
+      {
+        value: 'monorepo-lib',
+        label: 'Monorepo Library',
+        hint: 'Choose this if you want to add a new library to a monorepo.',
+      },
     ],
     initialValue: 'lib',
   })
@@ -197,6 +207,10 @@ async function askChangesets({
     return true
   }
 
+  if (projectType === 'monorepo-app' || projectType === 'monorepo-lib') {
+    return false
+  }
+
   const shouldContinue = await confirm({
     message: 'Do you want to add Changesets?',
   })
@@ -209,9 +223,16 @@ async function askChangesets({
   return shouldContinue
 }
 
-async function askInitGit({ git }: { git?: boolean } = {}) {
+async function askInitGit({
+  git,
+  projectType,
+}: { git?: boolean; projectType?: string } = {}) {
   if (git) {
     return true
+  }
+
+  if (projectType === 'monorepo-app' || projectType === 'monorepo-lib') {
+    return false
   }
 
   const shouldContinue = await confirm({
@@ -226,9 +247,16 @@ async function askInitGit({ git }: { git?: boolean } = {}) {
   return shouldContinue
 }
 
-async function askActions({ actions }: { actions?: boolean } = {}) {
+async function askActions({
+  actions,
+  projectType,
+}: { actions?: boolean; projectType?: string } = {}) {
   if (actions) {
     return true
+  }
+
+  if (projectType === 'monorepo-app' || projectType === 'monorepo-lib') {
+    return false
   }
 
   const shouldContinue = await confirm({
@@ -243,7 +271,15 @@ async function askActions({ actions }: { actions?: boolean } = {}) {
   return shouldContinue
 }
 
-export async function askInstallDeps() {
+export async function askInstallDeps({
+  projectType,
+}: {
+  projectType: 'app' | 'lib' | 'monorepo' | 'monorepo-app' | 'monorepo-lib'
+}) {
+  // we don't need to run install deps for projects added to a monorepo
+  if (projectType === 'monorepo-app' || projectType === 'monorepo-lib') {
+    return false
+  }
   const shouldContinue = await confirm({
     message: 'Do you want to install dependencies now?',
   })
