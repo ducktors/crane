@@ -1,5 +1,11 @@
 # create-crane
 
+## 0.3.0
+
+### Minor Changes
+
+- 40e718f: Fix GH templates and adds inject command
+
 ## 0.2.1
 
 ### Patch Changes
