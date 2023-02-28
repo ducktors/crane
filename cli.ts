@@ -9,7 +9,7 @@ import { renderLib } from './lib/renderers/lib'
 import { renderMonorepo } from './lib/renderers/monorepo'
 import { renderWithChangesets } from './lib/renderers/wtih-changesets'
 import { renderWithHusky } from './lib/renderers/wtih-husky'
-import { renderWithActions } from './lib/renderers/wtih-actions'
+import { renderWithGH } from './lib/renderers/wtih-gh'
 import { gitInitRepo } from './lib/git-init-repo'
 import { renderReadme } from './lib/renderers/readme'
 import { getCommand } from './lib/get-command'
@@ -35,7 +35,7 @@ const { _, lib, app, monorepo, force, inject, git, actions, changesets } =
 
 const cwd = process.cwd()
 const projectDir = _[0]
-const defaultProjectName = projectDir
+const defaultProjectDir = projectDir
 
 if ([app, lib, monorepo].filter(Boolean).length > 1) {
   console.log(
@@ -52,7 +52,7 @@ async function main() {
   intro(bgYellow(black(' Crane CLI ')))
 
   const {
-    projectName,
+    projectDir,
     existingProject,
     packageName,
     projectType,
@@ -60,7 +60,7 @@ async function main() {
     initGit,
     initActions,
   } = await runPrompt({
-    projectDir: defaultProjectName,
+    projectDir: defaultProjectDir,
     app,
     lib,
     monorepo,
@@ -71,7 +71,7 @@ async function main() {
     actions,
   })
 
-  const fullProjectDir = join(cwd, projectName)
+  const fullProjectDir = join(cwd, projectDir)
 
   const projectAlreadyExists = existsSync(fullProjectDir)
 
@@ -85,7 +85,7 @@ async function main() {
 
   await scaffold({
     fullProjectDir,
-    projectName,
+    existingProject,
     packageName,
     projectType,
     initChangesets,
@@ -93,7 +93,7 @@ async function main() {
     initActions,
   })
 
-  const shouldInstallDeps = await askInstallDeps()
+  const shouldInstallDeps = await askInstallDeps({ projectType })
   if (shouldInstallDeps) {
     await executeInstallDeps({
       fullProjectDir,
@@ -160,32 +160,34 @@ async function executeInstallDeps({
 
 async function scaffold({
   fullProjectDir,
+  existingProject,
   projectType,
   packageName,
-  projectName,
   initChangesets,
   initGit,
   initActions,
 }: {
   fullProjectDir: string
-  projectType: string
+  existingProject: 'force' | 'inject' | 'skip'
+  projectType: 'app' | 'lib' | 'monorepo' | 'monorepo-app' | 'monorepo-lib'
   packageName: string
-  projectName: string
   initChangesets: boolean
   initGit: boolean
   initActions: boolean
 }) {
   try {
     const s = spinner()
-    s.start(`Scaffolding ${projectName} in ${fullProjectDir}...`)
+    const actionMessage =
+      existingProject === 'inject' ? 'Injecting' : 'Scaffolding'
+    s.start(`${actionMessage} ${packageName} in ${fullProjectDir}...`)
     const templateRoot = resolve(__dirname, 'template')
 
-    if (projectType === 'app') {
-      renderApp(templateRoot, packageName, fullProjectDir)
-    } else if (projectType === 'lib') {
-      renderLib(templateRoot, packageName, fullProjectDir)
+    if (projectType === 'app' || projectType === 'monorepo-app') {
+      await renderApp(templateRoot, packageName, fullProjectDir, projectType)
+    } else if (projectType === 'lib' || projectType === 'monorepo-lib') {
+      await renderLib(templateRoot, packageName, fullProjectDir, projectType)
     } else if (projectType === 'monorepo') {
-      renderMonorepo(templateRoot, packageName, fullProjectDir)
+      await renderMonorepo(templateRoot, fullProjectDir)
     }
     s.stop('Base scaffolding complete')
 
@@ -205,7 +207,10 @@ async function scaffold({
       if (initActions) {
         const spinnerActions = spinner()
         spinnerActions.start('Adding GitHub actions...')
-        renderWithActions(templateRoot, fullProjectDir, 'standalone')
+        renderWithGH(templateRoot, fullProjectDir, 'standalone')
+        if (projectType === 'monorepo') {
+          renderWithGH(templateRoot, fullProjectDir, 'monorepo')
+        }
         spinnerActions.stop('GitHub actions added')
       }
       const spinnerGit = spinner()
@@ -216,14 +221,11 @@ async function scaffold({
 
     const spinnerReadme = spinner()
     spinnerReadme.start('Rendering README...')
-    renderReadme(
-      projectName ?? packageName ?? defaultProjectName,
-      projectType,
-      fullProjectDir,
-    )
+    renderReadme(packageName ?? defaultProjectDir, projectType, fullProjectDir)
     spinnerReadme.stop('README rendered')
   } catch (e) {
-    console.log(red('✖'), bgRed(' Failed to scaffold the project'))
+    const actionMessage = existingProject === 'inject' ? 'inject' : 'scaffold'
+    console.log(red('✖'), bgRed(` Failed to ${actionMessage} the project`))
     console.log()
     console.log(e)
     process.exit(1)
@@ -241,39 +243,41 @@ function printGuideText({
   projectType: string
   shouldInstallDeps: boolean
 }) {
-  console.log(bold('Now run:\n'))
-  if (fullProjectDir !== cwd) {
-    console.log(`  ${bold(green(`cd ${relative(cwd, fullProjectDir)}`))}`)
-  }
-  if (!shouldInstallDeps) {
-    console.log(`  ${bold(green(getCommand('pnpm', 'install')))}`)
-  }
+  if (projectType !== 'monorepo-app' && projectType !== 'monorepo-lib') {
+    console.log(bold('Now run:\n'))
+    if (fullProjectDir !== cwd) {
+      console.log(`  ${bold(green(`cd ${relative(cwd, fullProjectDir)}`))}`)
+    }
+    if (!shouldInstallDeps) {
+      console.log(`  ${bold(green(getCommand('pnpm', 'install')))}`)
+    }
 
-  console.log()
-  console.log(bold('Other available commands:\n'))
-  console.log()
+    console.log()
+    console.log(bold('Other available commands:\n'))
+    console.log()
 
-  console.log(`  ${bold(green(getCommand('pnpm', 'dev')))}`)
-  console.log(`  ${bold(green(getCommand('pnpm', 'build')))}`)
-  console.log(`  ${bold(green(getCommand('pnpm', 'test')))}`)
-  console.log(`  ${bold(green(getCommand('pnpm', 'test:ci')))}`)
-  console.log(`  ${bold(green(getCommand('pnpm', 'lint')))}`)
-  console.log(`  ${bold(green(getCommand('pnpm', 'format')))}`)
+    console.log(`  ${bold(green(getCommand('pnpm', 'dev')))}`)
+    console.log(`  ${bold(green(getCommand('pnpm', 'build')))}`)
+    console.log(`  ${bold(green(getCommand('pnpm', 'test')))}`)
+    console.log(`  ${bold(green(getCommand('pnpm', 'test:ci')))}`)
+    console.log(`  ${bold(green(getCommand('pnpm', 'lint')))}`)
+    console.log(`  ${bold(green(getCommand('pnpm', 'format')))}`)
 
-  if (changesets) {
-    console.log(`  ${bold(green(getCommand('pnpm', 'changeset')))}`)
-    console.log(`  ${bold(green(getCommand('pnpm', 'changeset version')))}`)
-    console.log(`  ${bold(green(getCommand('pnpm', 'release')))}`)
-  }
-  console.log()
+    if (changesets) {
+      console.log(`  ${bold(green(getCommand('pnpm', 'changeset')))}`)
+      console.log(`  ${bold(green(getCommand('pnpm', 'changeset version')))}`)
+      console.log(`  ${bold(green(getCommand('pnpm', 'release')))}`)
+    }
+    console.log()
 
-  if (projectType === 'monorepo') {
-    console.log(
-      `${bold(
-        yellow(
-          `To enable Turborepo Remote Cache, don't forget to put your settings inside ${fullProjectDir}/.turbo/config.json file.`,
-        ),
-      )}`,
-    )
+    if (projectType === 'monorepo') {
+      console.log(
+        `${bold(
+          yellow(
+            `To enable Turborepo Remote Cache, don't forget to put your settings inside ${fullProjectDir}/.turbo/config.json file.`,
+          ),
+        )}`,
+      )
+    }
   }
 }
