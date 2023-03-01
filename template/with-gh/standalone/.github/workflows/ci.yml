@@ -150,7 +150,6 @@ jobs:
       - name: Convert json coverage report to lcov
         run: |
           pnpm dlx nyc report --reporter=lcov --temp-directory=coverage
-          ls -al ./coverage/
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
