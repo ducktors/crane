@@ -1,5 +1,11 @@
 # create-crane
 
+## 0.4.0
+
+### Minor Changes
+
+- 0f52d2d: Inject crane into crane
+
 ## 0.3.0
 
 ### Minor Changes
