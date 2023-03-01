@@ -1,8 +1,5 @@
 {
   "extends": "@ducktors/tsconfig",
-  "compilerOptions": {
-    "outDir": "dist"
-  },
   "include": [
     "**/*.ts"
   ]

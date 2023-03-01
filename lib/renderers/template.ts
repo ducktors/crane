@@ -55,11 +55,8 @@ function renderTemplate(
     dest = resolve(dirname(dest), filename.replace(/^_/, '.'))
   }
 
-  if (
-    filename === '_gitignore' &&
-    existsSync(dest) &&
-    existingProject !== 'inject'
-  ) {
+  if (filename === '_gitignore' && existsSync(dest)) {
+    if (existingProject === 'inject') return
     // append to existing .gitignore
     const existing = readFileSync(dest, 'utf8')
     const newGitignore = readFileSync(src, 'utf8')

@@ -6,7 +6,7 @@ export default defineConfig({
     coverage: {
       all: true,
       reportsDirectory: 'coverage',
-      reporter: ['lcovonly', 'text-summary'],
+      reporter: ['json', 'text-summary'],
       provider: 'istanbul',
       include: ['**/*.{ts,tsx}'],
       exclude: ['template/**/*.{ts,tsx}'],

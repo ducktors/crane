@@ -1,0 +1,10 @@
+{
+  "extends": "@ducktors/tsconfig",
+  "compilerOptions": {
+    "outDir": ".",
+    "sourceMap": false
+  },
+  "files": [
+    "cli.ts"
+  ]
+}

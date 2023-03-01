@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { intro, outro, spinner } from '@clack/prompts'
 import { red, bold, bgYellow, black, yellow, green, bgRed } from 'picocolors'
 import minimist from 'minimist'

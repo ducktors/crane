@@ -3,6 +3,11 @@ name: CI
 on:
   pull_request:
 
+env:
+  TURBO_API: https://eu.trrc.ducktors.dev
+  TURBO_TEAM: ducktors
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -18,7 +23,7 @@ jobs:
           fetch-depth: 0
 
       - name: Remove tsconfig.json
-        run: rm tsconfig.json # https://github.com/wagoid/commitlint-github-action/issues/560#issuecomment-1277659864
+        run: rm tsconfig.json || true # https://github.com/wagoid/commitlint-github-action/issues/560#issuecomment-1277659864
 
       - name: Check commit message
         uses: wagoid/commitlint-github-action@v5
@@ -33,7 +38,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x, 18.x]
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v3
         name: Checkout
@@ -41,26 +46,82 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
       - uses: pnpm/action-setup@v2
         name: Install pnpm
         with:
-          version: 7.27.0
-      - name: Install with pnpm
-        run: pnpm install
-      - name: Lint code
-        run: pnpm lint
+          version: 7
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Build
         run: pnpm build
 
+  lint:
+    runs-on: macos-latest
+    name: Lint
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        with:
+          version: 7
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint code
+        run: pnpm lint
+
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     name: Test
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ matrix.node-version }}
 
       - uses: pnpm/action-setup@v2
         with:
@@ -86,12 +147,25 @@ jobs:
       - name: Run tests
         run: pnpm test:ci
 
+      - name: Copy json coverage report
+        run: |
+          mkdir -p coverage
+          cp ./packages/package-name/coverage/coverage-final.json ./coverage/package-name.json
+
+      - name: Merge json coverage reports
+        run: pnpm dlx nyc merge coverage coverage/merged-coverage.json
+
+      - name: Convert json coverage report to lcov
+        run: |
+          pnpm dlx nyc report --reporter=lcov --temp-directory=coverage
+          ls -al ./coverage/
+
       - name: Coveralls
         uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
-          
+
       - name: CodeClimate
         uses: paambaati/codeclimate-action@v3.2.0
         continue-on-error: true
