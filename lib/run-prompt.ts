@@ -12,6 +12,7 @@ export async function runPrompt({
   inject,
   changesets,
   git,
+  commitlint,
   actions,
 }: {
   projectDir: string
@@ -22,6 +23,7 @@ export async function runPrompt({
   inject?: boolean
   changesets?: boolean
   git?: boolean
+  commitlint?: boolean
   actions?: boolean
 }) {
   const chosenProjectDir = await askProjectDir({ projectDir })
@@ -30,7 +32,10 @@ export async function runPrompt({
     force,
     inject,
   })
-  const packageName = await askPackageName({ projectDir: chosenProjectDir })
+  const packageName = await askPackageName({
+    projectDir: chosenProjectDir,
+    existingProject,
+  })
   const projectType = await askProjectType({
     app,
     lib,
@@ -41,6 +46,11 @@ export async function runPrompt({
     changesets,
   })
   const initGit = await askInitGit({ git, projectType })
+  const initCommitLint = await askInitCommitlint({
+    git,
+    projectType,
+    commitlint,
+  })
   const initActions = await askActions({ actions, projectType })
 
   return {
@@ -50,6 +60,7 @@ export async function runPrompt({
     projectType,
     initChangesets,
     initGit,
+    initCommitLint,
     initActions,
   }
 }
@@ -127,7 +138,16 @@ async function askExistingProject({
   return existingProject
 }
 
-async function askPackageName({ projectDir }: { projectDir?: string }) {
+async function askPackageName({
+  projectDir,
+  existingProject,
+}: {
+  projectDir?: string
+  existingProject?: 'force' | 'inject' | 'skip'
+} = {}) {
+  if (existingProject) {
+    return undefined
+  }
   const initialValue = projectDir ? toValidPackageName(projectDir) : undefined
   const packageName = await text({
     message: 'Package name:',
@@ -237,6 +257,35 @@ async function askInitGit({
 
   const shouldContinue = await confirm({
     message: 'Do you want to initialize git?',
+  })
+
+  if (isCancel(shouldContinue)) {
+    cancel('Operation cancelled')
+    return process.exit(0)
+  }
+
+  return shouldContinue
+}
+
+async function askInitCommitlint({
+  git,
+  projectType,
+  commitlint,
+}: { git?: boolean; projectType?: string; commitlint?: boolean } = {}) {
+  if (!git) {
+    return false
+  }
+
+  if (projectType === 'monorepo-app' || projectType === 'monorepo-lib') {
+    return false
+  }
+
+  if (commitlint) {
+    return true
+  }
+
+  const shouldContinue = await confirm({
+    message: 'Do you want to add commitlint?',
   })
 
   if (isCancel(shouldContinue)) {

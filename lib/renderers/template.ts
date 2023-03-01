@@ -13,7 +13,11 @@ import { basename, resolve, dirname } from 'node:path'
 import { deepMerge } from '../deep-merge'
 import { sortProperties } from '../sort-properties'
 
-function renderTemplate(src: string, dest: string) {
+function renderTemplate(
+  src: string,
+  dest: string,
+  existingProject?: 'force' | 'inject' | 'skip',
+) {
   const stats = statSync(src)
 
   if (stats.isDirectory()) {
@@ -22,10 +26,15 @@ function renderTemplate(src: string, dest: string) {
       return
     }
 
+    // skip src folder if it's an existing project
+    if (basename(src) === 'src' && existingProject === 'inject') {
+      return
+    }
+
     // if it's a directory, render its subdirectories and files recursively
     mkdirSync(dest, { recursive: true })
     for (const file of readdirSync(src)) {
-      renderTemplate(resolve(src, file), resolve(dest, file))
+      renderTemplate(resolve(src, file), resolve(dest, file), existingProject)
     }
     return
   }
@@ -47,6 +56,7 @@ function renderTemplate(src: string, dest: string) {
   }
 
   if (filename === '_gitignore' && existsSync(dest)) {
+    if (existingProject === 'inject') return
     // append to existing .gitignore
     const existing = readFileSync(dest, 'utf8')
     const newGitignore = readFileSync(src, 'utf8')

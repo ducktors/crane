@@ -6,12 +6,15 @@ export function renderReadme(
   projectName: string,
   projectType: string,
   destFolder: string,
+  existingProject: 'force' | 'inject' | 'skip',
 ) {
-  writeFileSync(
-    resolve(destFolder, 'README.md'),
-    generateReadme({
-      projectName,
-      projectType,
-    }),
-  )
+  if (existingProject !== 'inject') {
+    writeFileSync(
+      resolve(destFolder, 'README.md'),
+      generateReadme({
+        projectName,
+        projectType,
+      }),
+    )
+  }
 }
