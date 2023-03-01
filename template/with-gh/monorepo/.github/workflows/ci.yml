@@ -146,6 +146,14 @@ jobs:
 
       - name: Run tests
         run: pnpm test:ci
+      
+      - name: Copy json coverage report
+        run: |
+          mkdir -p coverage
+          cp ./packages/package-name/coverage/coverage-final.json ./coverage/package-name.json
+
+      - name: Merge json coverage reports
+        run: pnpm dlx nyc merge coverage coverage/merged-coverage.json
 
       - name: Convert json coverage report to lcov
         run: |
