@@ -3,7 +3,8 @@
   "linter": {
     "enabled": true,
     "ignore": [
-      "dist"
+      "dist",
+      "coverage"
     ],
     "rules": {
       "recommended": true,
@@ -15,7 +16,8 @@
   "formatter": {
     "enabled": true,
     "ignore": [
-      "dist"
+      "dist",
+      "coverage"
     ],
     "indentStyle": "space"
   },
