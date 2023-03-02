@@ -19,6 +19,8 @@ import { installDeps } from './lib/inistall-deps'
 import { ensurePnpm } from './lib/ensure-pnpm'
 import { renderWithCommitlint } from './lib/renderers/with-commitlint'
 
+const { version } = require('./package.json')
+
 // possible options:
 // --lib
 // --app
@@ -62,7 +64,7 @@ async function main() {
   await ensurePnpm()
 
   console.log()
-  intro(bgYellow(black(' Crane CLI ')))
+  intro(bgYellow(black(` Crane CLI v${version} `)))
 
   const {
     projectDir,
@@ -122,6 +124,7 @@ async function main() {
     changesets,
     projectType,
     shouldInstallDeps,
+    initGit,
   })
 }
 
@@ -204,7 +207,6 @@ async function scaffold({
         templateRoot,
         packageName,
         fullProjectDir,
-        projectType,
         existingProject,
       )
     } else if (projectType === 'lib' || projectType === 'monorepo-lib') {
@@ -212,7 +214,6 @@ async function scaffold({
         templateRoot,
         packageName,
         fullProjectDir,
-        projectType,
         existingProject,
       )
     } else if (projectType === 'monorepo') {
@@ -280,11 +281,13 @@ function printGuideText({
   changesets,
   projectType,
   shouldInstallDeps,
+  initGit,
 }: {
   fullProjectDir: string
   changesets: boolean
   projectType: string
   shouldInstallDeps: boolean
+  initGit: boolean
 }) {
   if (projectType !== 'monorepo-app' && projectType !== 'monorepo-lib') {
     console.log(bold('Now run:\n'))
@@ -295,8 +298,19 @@ function printGuideText({
       console.log(`  ${bold(green(getCommand('pnpm', 'install')))}`)
     }
 
+    if (initGit) {
+      console.log()
+      console.log(
+        `${bold(
+          yellow(
+            'Check the .husky folder and make sure the hooks are executable. If not, run: chmod ug+x .husky/*',
+          ),
+        )}`,
+      )
+    }
+
     console.log()
-    console.log(bold('Other available commands:\n'))
+    console.log(bold('Available commands:\n'))
     console.log()
 
     console.log(`  ${bold(green(getCommand('pnpm', 'dev')))}`)
