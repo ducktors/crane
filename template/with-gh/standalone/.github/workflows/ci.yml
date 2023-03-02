@@ -148,8 +148,7 @@ jobs:
         run: pnpm test:ci
 
       - name: Convert json coverage report to lcov
-        run: |
-          pnpm dlx nyc report --reporter=lcov --temp-directory=coverage
+        run: pnpm dlx nyc report --reporter=lcov --temp-directory=coverage
 
       - name: Coveralls
         uses: coverallsapp/github-action@master

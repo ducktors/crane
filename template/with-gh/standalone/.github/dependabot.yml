@@ -8,10 +8,6 @@ updates:
     commit-message:
       prefix: "fix(deps)"
       prefix-development: "chore(deps):"
-    assignees:
-      - "matteovivona"
-    reviewers:
-      - "matteovivona"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -19,10 +15,6 @@ updates:
       interval: "daily"
     commit-message:
       prefix: "chore(actions)"
-    assignees:
-      - "matteovivona"
-    reviewers:
-      - "matteovivona"
 
   - package-ecosystem: "docker"
     directory: "/"
@@ -30,7 +22,3 @@ updates:
       interval: "daily"
     commit-message:
       prefix: "fix(docker)"
-    assignees:
-      - "matteovivona"
-    reviewers:
-      - "matteovivona"
