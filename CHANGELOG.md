@@ -1,5 +1,11 @@
 # create-crane
 
+## 0.4.1
+
+### Patch Changes
+
+- f435a17: fix: update CI and GH templates
+
 ## 0.4.0
 
 ### Minor Changes
