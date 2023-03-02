@@ -1,5 +1,11 @@
 # create-crane
 
+## 0.4.2
+
+### Patch Changes
+
+- 5cbca49: fix: add rome.json to every app and package in the monorepo
+
 ## 0.4.1
 
 ### Patch Changes
