@@ -148,7 +148,7 @@ function createFolder(fullProjectDir: string) {
   const s = spinner()
   s.start(`Creating project folder: ${fullProjectDir}`)
   try {
-    mkdirSync(fullProjectDir)
+    mkdirSync(fullProjectDir, { recursive: true })
   } catch (e) {
     console.log(red('✖'), bgRed(' Failed to create project folder'))
     console.log()
