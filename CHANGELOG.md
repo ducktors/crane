@@ -1,5 +1,11 @@
 # create-crane
 
+## 0.4.3
+
+### Patch Changes
+
+- 0d2452a: fix: add recursive during the project folder creation
+
 ## 0.4.2
 
 ### Patch Changes
