@@ -3743,8 +3743,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /rollup@3.27.0:
-    resolution: {integrity: sha512-aOltLCrYZ0FhJDm7fCqwTjIUEVjWjcydKBV/Zeid6Mn8BWgDCUBBWT5beM5ieForYNo/1ZHuGJdka26kvQ3Gzg==}
+  /rollup@3.29.4:
+    resolution: {integrity: sha512-oWzmBZwvYrU0iJHtDmhsm662rC15FRXmcjCk1xD771dFDx5jJ02ufAQQTn0etB2emNk4J9EZg/yWKpsn9BWGRw==}
     engines: {node: '>=14.18.0', npm: '>=8.0.0'}
     hasBin: true
     optionalDependencies:
@@ -4436,7 +4436,7 @@ packages:
       picocolors: 1.0.0
       source-map: 0.6.1
       source-map-support: 0.5.21
-      vite: 4.4.8(@types/node@16.18.13)
+      vite: 4.5.2(@types/node@16.18.13)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -4448,8 +4448,8 @@ packages:
       - terser
     dev: true
 
-  /vite@4.4.8(@types/node@16.18.13):
-    resolution: {integrity: sha512-LONawOUUjxQridNWGQlNizfKH89qPigK36XhMI7COMGztz8KNY0JHim7/xDd71CZwGT4HtSRgI7Hy+RlhG0Gvg==}
+  /vite@4.5.2(@types/node@16.18.13):
+    resolution: {integrity: sha512-tBCZBNSBbHQkaGyhGCDUGqeo2ph8Fstyp6FMSvTtsXeZSPpSMGlviAOav2hxVTqFcx8Hj/twtWKsMJXNY0xI8w==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -4479,7 +4479,7 @@ packages:
       '@types/node': 16.18.13
       esbuild: 0.18.17
       postcss: 8.4.31
-      rollup: 3.27.0
+      rollup: 3.29.4
     optionalDependencies:
       fsevents: 2.3.2
     dev: true
@@ -4527,7 +4527,7 @@ packages:
       tinybench: 2.3.1
       tinypool: 0.3.1
       tinyspy: 1.1.1
-      vite: 4.4.8(@types/node@16.18.13)
+      vite: 4.5.2(@types/node@16.18.13)
       vite-node: 0.28.5(@types/node@16.18.13)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
