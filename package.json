@@ -25,6 +25,7 @@
   "keywords": [],
   "author": "Ducktors <your@ducktors.dev> (https://ducktors.dev)",
   "license": "MIT",
+  "packageManager": "pnpm@10.33.2",
   "dependencies": {
     "@clack/prompts": "^0.2.2",
     "execa": "^6.1.0",
